@@ -25,7 +25,6 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         while ismember(startingCell(1), previousStartCellsI) || ismember(startingCell(2), previousStartCellsJ)
             startingCell = [randi(gridSize) randi(gridSize)];
         end
-        % startingCell
         previousStartCellsI(end+1) = startingCell(1);
         previousStartCellsJ(end+1) = startingCell(2);
         terrainGrid(startingCell(1), startingCell(2)) = 6;
@@ -48,35 +47,35 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         gridPossibilities = updateGridPossibilities(gridPossibilities, startingCell(1), startingCell(2), gridSize, possibleNeighbors, hasBeenSet);
     end
       
-    % r = zeros(gridSize*numPixelsPerSquare);
-    % b = r;
-    % g = r;
-    % 
-    % for i = 1:1:gridSize*numPixelsPerSquare
-    %     for j = 1:1:gridSize*numPixelsPerSquare
-    %         iVal = ceil(i/numPixelsPerSquare);
-    %         jVal = ceil(j/numPixelsPerSquare);
-    % 
-    %         rVals = zeros(length(gridPossibilities(iVal,jVal)),1);
-    %         gVals = rVals;
-    %         bVals = rVals;
-    % 
-    %         for k = 1:1:length(gridPossibilities(iVal,jVal,:))
-    %             currGridIndex = gridPossibilities(iVal,jVal, k);
-    %             if currGridIndex ~= 0
-    %                 rVals(k) = rgbColorMap(currGridIndex, 1);
-    %                 gVals(k) = rgbColorMap(currGridIndex, 2);
-    %                 bVals(k) = rgbColorMap(currGridIndex, 3);
-    %             end
-    %         end
-    %         r(i,j) = mean(rVals);
-    %         g(i,j) = mean(gVals);
-    %         b(i,j) = mean(bVals);
-    %     end
-    % end
-    % 
-    % rgbImgArray = cat(3, r, g, b);
-    % figure, imshow(rgbImgArray)
+    r = zeros(gridSize*numPixelsPerSquare);
+    b = r;
+    g = r;
+
+    for i = 1:1:gridSize*numPixelsPerSquare
+        for j = 1:1:gridSize*numPixelsPerSquare
+            iVal = ceil(i/numPixelsPerSquare);
+            jVal = ceil(j/numPixelsPerSquare);
+
+            rVals = zeros(length(gridPossibilities(iVal,jVal)),1);
+            gVals = rVals;
+            bVals = rVals;
+
+            for k = 1:1:length(gridPossibilities(iVal,jVal,:))
+                currGridIndex = gridPossibilities(iVal,jVal, k);
+                if currGridIndex ~= 0
+                    rVals(k) = rgbColorMap(currGridIndex, 1);
+                    gVals(k) = rgbColorMap(currGridIndex, 2);
+                    bVals(k) = rgbColorMap(currGridIndex, 3);
+                end
+            end
+            r(i,j) = mean(rVals);
+            g(i,j) = mean(gVals);
+            b(i,j) = mean(bVals);
+        end
+    end
+
+    rgbImgArray = cat(3, r, g, b);
+    figure, imshow(rgbImgArray)
 
 
     % f = waitbar(0, 'Generating Terrain');
@@ -155,6 +154,7 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
             % i
             % j
             % disp("Error: Vector of zeros found")
+            randomNumber = 1;
         end
 
         terrainGrid(i,j) = randomNumber;
@@ -165,8 +165,8 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
 
         % waitbar(l/n, f, sprintf('Generating Terrain: %d %%', floor(l/n*100)));
                 
-        % if mod(l, round((gridSize^2)/20)) == 0 
-        if false
+        if mod(l, round((gridSize^2)/20)) == 0 
+        % if false
         r = zeros(gridSize*numPixelsPerSquare);
         b = r;
         g = r;
@@ -244,8 +244,45 @@ function updatedPossibilities = updateGridPossibilities(gridPossibilities, i, j,
             tempVector = tempVector(tempVector ~= 0);
             updatedPossibilities(i, j-1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
     end
+
+    if j > 1 && i > 1 && hasBeenSet(i-1, j-1) == 0
+            currVec = zeros(1, numTerrainTypes(3));
+            for k = 1:1:numTerrainTypes(3)
+                currVec(end+1) = gridPossibilities(i-1,j-1,k);
+            end
+            tempVector = intersect(possibleNeighbors(gridPossibilities(i,j), :), currVec);
+            tempVector = tempVector(tempVector ~= 0);
+            updatedPossibilities(i-1, j-1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
+    end
+    if j < 1 && i < 1 && hasBeenSet(i+1, j+1) == 0
+            currVec = zeros(1, numTerrainTypes(3));
+            for k = 1:1:numTerrainTypes(3)
+                currVec(end+1) = gridPossibilities(i+1,j+1,k);
+            end
+            tempVector = intersect(possibleNeighbors(gridPossibilities(i,j), :), currVec);
+            tempVector = tempVector(tempVector ~= 0);
+            updatedPossibilities(i+1, j+1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
+    end
+    if j > 1 && i < 1 && hasBeenSet(i+1, j-1) == 0
+        currVec = zeros(1, numTerrainTypes(3));
+        for k = 1:1:numTerrainTypes(3)
+            currVec(end+1) = gridPossibilities(i+1,j-1,k);
+        end
+        tempVector = intersect(possibleNeighbors(gridPossibilities(i,j), :), currVec);
+        tempVector = tempVector(tempVector ~= 0);
+        updatedPossibilities(i+1, j-1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
+    end
+    if j < 1 && i > 1 && hasBeenSet(i-1, j+1) == 0
+        currVec = zeros(1, numTerrainTypes(3));
+        for k = 1:1:numTerrainTypes(3)
+            currVec(end+1) = gridPossibilities(i-1,j+1,k);
+        end
+        tempVector = intersect(possibleNeighbors(gridPossibilities(i,j), :), currVec);
+        tempVector = tempVector(tempVector ~= 0);
+        updatedPossibilities(i-1, j+1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
+    end
 end
 
 function returnVecOfCorrectLength = fillWithZeros(inputVec, numTerrainTypes)
-    returnVecOfCorrectLength = [inputVec, zeros(1, max(0, numTerrainTypes - length(inputVec)))];
+returnVecOfCorrectLength = [inputVec, zeros(1, max(0, numTerrainTypes - length(inputVec)))];
 end
