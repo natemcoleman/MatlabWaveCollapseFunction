@@ -1,8 +1,13 @@
 function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, possibleNeighbors, probabilities, gifName, rgbColorMap, numPixelsPerSquare, numMountainSeeds, numWaterSeeds)
     % Create a 3D array
     gridPossibilities = zeros(gridSize, gridSize, length(terrainTypes));
+
+    probabilitiesToChange = probabilities;
     
     numTerrainTypes = size(gridPossibilities);
+
+    createGIF = false;
+    plottingFrequency = 100;
 
     % Fill the third dimension with a vector of numbers 1 through 5
     for i = 1:1:length(terrainTypes)
@@ -30,7 +35,7 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         terrainGrid(startingCell(1), startingCell(2)) = 6;
         hasBeenSet(startingCell(1), startingCell(2)) = 1;
         gridPossibilities(startingCell(1), startingCell(2),:) = fillWithZeros(terrainGrid(startingCell(1), startingCell(2)), numTerrainTypes(3));
-        gridPossibilities = updateGridPossibilities(gridPossibilities, startingCell(1), startingCell(2), gridSize, possibleNeighbors, hasBeenSet);
+        gridPossibilities = updateGridPossibilities(gridPossibilities, startingCell(1), startingCell(2), gridSize, possibleNeighbors, hasBeenSet, probabilitiesToChange);
     end
 
     for i = 1:1:numWaterSeeds
@@ -44,8 +49,10 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         terrainGrid(startingCell(1), startingCell(2)) = 2;
         hasBeenSet(startingCell(1), startingCell(2)) = 1;
         gridPossibilities(startingCell(1), startingCell(2),:) = fillWithZeros(terrainGrid(startingCell(1), startingCell(2)), numTerrainTypes(3));
-        gridPossibilities = updateGridPossibilities(gridPossibilities, startingCell(1), startingCell(2), gridSize, possibleNeighbors, hasBeenSet);
+        gridPossibilities = updateGridPossibilities(gridPossibilities, startingCell(1), startingCell(2), gridSize, possibleNeighbors, hasBeenSet, probabilitiesToChange);
     end
+
+    if createGIF
       
     r = zeros(gridSize*numPixelsPerSquare);
     b = r;
@@ -76,7 +83,7 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
 
     rgbImgArray = cat(3, r, g, b);
     figure, imshow(rgbImgArray)
-
+    end
 
     % f = waitbar(0, 'Generating Terrain');
     n = ((gridSize^2)-numWaterSeeds-numMountainSeeds);
@@ -161,11 +168,11 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         hasBeenSet(i,j) = 1;
         gridPossibilities(i,j,:) = fillWithZeros(terrainGrid(i,j), numTerrainTypes(3));
 
-        gridPossibilities = updateGridPossibilities(gridPossibilities, i, j, gridSize, possibleNeighbors, hasBeenSet);
+        gridPossibilities = updateGridPossibilities(gridPossibilities, i, j, gridSize, possibleNeighbors, hasBeenSet, probabilitiesToChange);
 
         % waitbar(l/n, f, sprintf('Generating Terrain: %d %%', floor(l/n*100)));
                 
-        if mod(l, round((gridSize^2)/20)) == 0 
+        if mod(l, round((gridSize^2)/plottingFrequency)) == 0 && createGIF 
         % if false
         r = zeros(gridSize*numPixelsPerSquare);
         b = r;
@@ -204,18 +211,50 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
     % close(f)
 end
 
-function updatedPossibilities = updateGridPossibilities(gridPossibilities, i, j, gridSize, possibleNeighbors, hasBeenSet)
-    updatedPossibilities = gridPossibilities;
+function [updatedPossibilities, updatedPossibilitiesPerCell] = updateGridPossibilities(gridPossibilities, i, j, gridSize, possibleNeighbors, hasBeenSet, possibilitiesPerCell)
+    updatedPossibilities = gridPossibilities
     numTerrainTypes = size(gridPossibilities);
+    updatedPossibilitiesPerCell = possibilitiesPerCell
 
     if i < gridSize && hasBeenSet(i+1, j) == 0
             currVec = zeros(1, numTerrainTypes(3));
+            currProbVec = currVec;
             for k = 1:1:numTerrainTypes(3)
                 currVec(end+1) = gridPossibilities(i+1,j,k);
             end
-            tempVector = intersect(possibleNeighbors(gridPossibilities(i,j), :), currVec);
+            currVec
+            
+            for k = 1:1:length(currVec)
+                % updatedPossibilitiesPerCell(gridPossibilities(i,j), :)
+                if currVec(k) ~= 0
+                    gridPossibilities(i,j)
+                    possibleNeighbors(gridPossibilities(i,j),:)
+                    currVec(k)
+                    % possibleNeighbors(currVec(k))
+                    % for y = 1:1:length(possibleNeighbors(currVec(k)))
+                    foundIndicies = find(possibleNeighbors(gridPossibilities(i,j)) == currVec(k));
+                    foundIndicies = find(possibleNeighbors(gridPossibilities(i,j),:) == currVec(k));
+                    % end
+                    % gridPossibilities(i,j)
+                    foundIndicies
+                    possibilitiesPerCell(gridPossibilities(i,j), foundIndicies)
+                    % size(currProbVec)
+                    % size(fillWithZeros(possibilitiesPerCell(gridPossibilities(i,j), foundIndicies), numTerrainTypes(3)))
+
+                    currProbVec(end+1,:) = fillWithZeros(possibilitiesPerCell(gridPossibilities(i,j), foundIndicies), numTerrainTypes(3));
+
+
+                    % currProbVec(end+1) = possibilitiesPerCell(gridPossibilities(i,j), foundIndicies);
+                end
+            end
+            currProbVec
+
+            [tempVector, iTemp, jTemp] = intersect(possibleNeighbors(gridPossibilities(i,j), :), currVec);
+            tempProbVec = updatedPossibilities(iTemp,jTemp);
+            tempProbVec = tempProbVec(tempVector~=0);
             tempVector = tempVector(tempVector ~= 0);
             updatedPossibilities(i+1, j, :) = fillWithZeros(tempVector, numTerrainTypes(3));
+            updatedPossibilitiesPerCell(i+1, j,:) = fillWithZeros(tempProbVec, numTerrainTypes(3));
     end
     if j < gridSize && hasBeenSet(i, j+1) == 0
             currVec = zeros(1, numTerrainTypes(3));

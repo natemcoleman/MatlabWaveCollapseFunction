@@ -1,24 +1,45 @@
 clc
+%Change probabilities so it is terrain specific and more than three values
+%if desired
+%Can make it so terrain CAN be by other terrains with a 0 probability of
+%spawning
 
 % Define terrain types
 terrainTypes = {'Grass', 'Water', 'Mountains', 'Sand', 'Forest', 'Snow', 'Shallow Water'};
-possibleNeighbors = [1 5 4 0 0 0; 2 2 7 0 0 0; 3 5 6 0 0 0; 2 1 2 0 0 0; 5 1 3 0 0 0; 6 3 3 0 0 0; 4 7 1 0 0 0];
-probabilities = [0.5 0.25 0.25 0 0];
+possibleNeighbors = [1 5 4 0 0 0; 
+                     2 2 7 0 0 0; 
+                     3 5 6 0 0 0; 
+                     2 1 2 0 0 0; 
+                     5 1 3 0 0 0; 
+                     6 3 3 0 0 0; 
+                     4 7 1 0 0 0];
+% probabilities = [0.5 0.25 0.25 0 0];
+probabilities = [0.5 0.25 0.25 0 0; 
+                 0.5 0.25 0.25 0 0; 
+                 0.5 0.25 0.25 0 0; 
+                 0.5 0.25 0.25 0 0; 
+                 0.5 0.25 0.25 0 0; 
+                 0.5 0.25 0.25 0 0; 
+                 0.5 0.25 0.25 0 0];
+
 
 % terrainTypes = {'Grass', 'Water', 'Mountains', 'Sand', 'Forest', 'Snow'};
 % possibleNeighbors = [1 5 2 0 0 0; 2 2 1 0 0 0; 3 6 5 0 0 0; 2 1 1 0 0 0; 3 5 1 0 0 0; 6 3 3 0 0 0];
 % probabilities = [0.6 0.2 0.2 0 0];
 % possibleNeighbors = [1 5 4 0 0 0; 1 2 4 0 0 0; 3 6 5 0 0 0; 2 1 4 0 0 0; 5 3 1 0 0 0; 6 3 3 0 0 0];
 
-gifName = 'WaveCollapse21.gif';
+gifName = 'WaveCollapse23.gif';
 
 % Define grid size
-gridSize = 50; % Adjust the size as needed
+gridSize = 25; % Adjust the size as needed
 
-numPixelsPerSquare = 5;
+numPixelsPerSquare = 10;
 
 numMountainSeeds = 5;
 numWaterSeeds = 8;
+
+% numMountainSeeds = randi(8);
+% numWaterSeeds = randi(8);
 
 rgbColorMap = [0.6250 0.7188 0.2578
                0.1172 0.5039 0.6875
