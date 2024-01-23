@@ -1,4 +1,4 @@
-function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, possibleNeighbors, probabilities, gifName, rgbColorMap, numPixelsPerSquare, numMountainSeeds, numWaterSeeds)
+function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, possibleNeighbors, probabilities, gifName, rgbColorMap, numPixelsPerSquare, numMountainSeeds, numWaterSeeds, createGIF, plottingFrequency)
     % Create a 3D array
     gridPossibilities = zeros(gridSize, gridSize, length(terrainTypes));
     
@@ -47,6 +47,7 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         gridPossibilities = updateGridPossibilities(gridPossibilities, startingCell(1), startingCell(2), gridSize, possibleNeighbors, hasBeenSet);
     end
       
+    if createGIF
     r = zeros(gridSize*numPixelsPerSquare);
     b = r;
     g = r;
@@ -76,7 +77,7 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
 
     rgbImgArray = cat(3, r, g, b);
     figure, imshow(rgbImgArray)
-
+    end
 
     % f = waitbar(0, 'Generating Terrain');
     n = ((gridSize^2)-numWaterSeeds-numMountainSeeds);
@@ -165,8 +166,7 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
 
         % waitbar(l/n, f, sprintf('Generating Terrain: %d %%', floor(l/n*100)));
                 
-        if mod(l, round((gridSize^2)/20)) == 0 
-        % if false
+        if mod(l, round((gridSize^2)/plottingFrequency)) == 0 && createGIF
         r = zeros(gridSize*numPixelsPerSquare);
         b = r;
         g = r;
