@@ -88,26 +88,30 @@ function terrainGrid = WaveFunctionCollapseAlgorithm(gridSize, terrainTypes, pos
         minSize = length(terrainTypes);
         for i = 1:1:gridSize
             for j = 1:1:gridSize
-                currVec = zeros(1, length(terrainTypes));
-                for k = 1:1:length(terrainTypes)
-                    currVec(k) = gridPossibilities(i,j,k);
-                end
-                nonZeroCurrVec = currVec(currVec ~= 0);
-                if length(nonZeroCurrVec) < minSize && hasBeenSet(i,j) == 0
-                    minSize = length(nonZeroCurrVec);
+                if hasBeenSet(i,j) == 0
+                    currVec = zeros(1, length(terrainTypes));
+                    for k = 1:1:length(terrainTypes)
+                        currVec(k) = gridPossibilities(i,j,k);
+                    end
+                    nonZeroCurrVec = currVec(currVec ~= 0);
+                    if length(nonZeroCurrVec) < minSize && hasBeenSet(i,j) == 0
+                        minSize = length(nonZeroCurrVec);
+                    end
                 end
             end
         end
         for i = 1:1:gridSize
             for j = 1:1:gridSize
-                currVec = zeros(1, length(terrainTypes));
-                for k = 1:1:length(terrainTypes)
-                    currVec(k) = gridPossibilities(i,j,k);
-                end
-                nonZeroCurrVec = currVec(currVec ~= 0);                
-                if length(nonZeroCurrVec) == minSize  && hasBeenSet(i,j) == 0
-                    iCell(end+1) = i;
-                    jCell(end+1) = j;
+                if hasBeenSet(i,j) == 0
+                    currVec = zeros(1, length(terrainTypes));
+                    for k = 1:1:length(terrainTypes)
+                        currVec(k) = gridPossibilities(i,j,k);
+                    end
+                    nonZeroCurrVec = currVec(currVec ~= 0);                
+                    if length(nonZeroCurrVec) == minSize  && hasBeenSet(i,j) == 0
+                        iCell(end+1) = i;
+                        jCell(end+1) = j;
+                    end
                 end
             end
         end
@@ -254,7 +258,7 @@ function updatedPossibilities = updateGridPossibilities(gridPossibilities, i, j,
             tempVector = tempVector(tempVector ~= 0);
             updatedPossibilities(i-1, j-1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
     end
-    if j < 1 && i < 1 && hasBeenSet(i+1, j+1) == 0
+    if j < gridSize && i < gridSize && hasBeenSet(i+1, j+1) == 0
             currVec = zeros(1, numTerrainTypes(3));
             for k = 1:1:numTerrainTypes(3)
                 currVec(end+1) = gridPossibilities(i+1,j+1,k);
@@ -263,7 +267,7 @@ function updatedPossibilities = updateGridPossibilities(gridPossibilities, i, j,
             tempVector = tempVector(tempVector ~= 0);
             updatedPossibilities(i+1, j+1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
     end
-    if j > 1 && i < 1 && hasBeenSet(i+1, j-1) == 0
+    if j > 1 && i < gridSize && hasBeenSet(i+1, j-1) == 0
         currVec = zeros(1, numTerrainTypes(3));
         for k = 1:1:numTerrainTypes(3)
             currVec(end+1) = gridPossibilities(i+1,j-1,k);
@@ -272,7 +276,7 @@ function updatedPossibilities = updateGridPossibilities(gridPossibilities, i, j,
         tempVector = tempVector(tempVector ~= 0);
         updatedPossibilities(i+1, j-1, :) = fillWithZeros(tempVector, numTerrainTypes(3));
     end
-    if j < 1 && i > 1 && hasBeenSet(i-1, j+1) == 0
+    if j < gridSize && i > 1 && hasBeenSet(i-1, j+1) == 0
         currVec = zeros(1, numTerrainTypes(3));
         for k = 1:1:numTerrainTypes(3)
             currVec(end+1) = gridPossibilities(i-1,j+1,k);

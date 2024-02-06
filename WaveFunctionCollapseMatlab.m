@@ -12,6 +12,9 @@ probabilities = [0.5 0.25 0.25 0 0];
 % probabilities = [0.6 0.2 0.2 0 0];
 % possibleNeighbors = [1 5 4 0 0 0; 1 2 4 0 0 0; 3 6 5 0 0 0; 2 1 4 0 0 0; 5 3 1 0 0 0; 6 3 3 0 0 0];
 
+% Define grid size
+gridSize = 50; % Adjust the size as needed
+
 gifName = 'WaveCollapse26.gif';
 createGIF = false;
 plottingFrequency = 25;
@@ -23,8 +26,7 @@ maxPossibleRandomSeeds = 10;
 numMountainSeeds = 3;
 numWaterSeeds = 8;
 
-% Define grid size
-gridSize = 100; % Adjust the size as needed
+
 
 numPixelsPerSquare = round(720/gridSize); %720p
 
